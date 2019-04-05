@@ -1,6 +1,15 @@
 package relay
 
 /*
+Node is an interface for types satisfying Relay's Node interface
+
+https://facebook.github.io/relay/graphql/objectidentification.htm#sec-Node-Interface
+*/
+type Node interface {
+	ID() string
+}
+
+/*
 Edge is an interface holding a node and a cursor
 
 https://facebook.github.io/relay/graphql/connections.htm#sec-Edge-Types
@@ -45,22 +54,26 @@ type ConnectionArgs struct {
 }
 
 /*
-ConnectionFromSlice creates a connection from a slice of nodes
+ConnectionFromArray creates a connection from an array of nodes
 */
-func ConnectionFromSlice(nodes []Node, args *ConnectionArgs) *Connection {
+func ConnectionFromArray(nodes []Node, args *ConnectionArgs) *Connection {
+	if args == nil {
+		return nil
+	}
+
 	edges := make([]*Edge, len(nodes))
-	for _, n := range nodes {
-		edges = append(edges, &Edge{
+	for i, n := range nodes {
+		edges[i] = &Edge{
 			Node:   n,
 			Cursor: n.ID(),
-		})
+		}
 	}
 
 	return EdgesToReturn(edges, args.Before, args.After, args.First, args.Last)
 }
 
 /*
-EdgesToReturn TODO
+EdgesToReturn slices edges according to arguments, returning a connection
 
 Consider returning an error like in
 https://facebook.github.io/relay/graphql/connections.htm#sec-Pagination-algorithm
@@ -73,7 +86,7 @@ func EdgesToReturn(all []*Edge, before, after *string, first, last int) *Connect
 	}
 
 	if last > 0 && last < len(edges) {
-		edges = edges[:last]
+		edges = edges[len(edges)-last:]
 	}
 
 	var startCursor, endCursor *string
@@ -99,7 +112,7 @@ func EdgesToReturn(all []*Edge, before, after *string, first, last int) *Connect
 }
 
 /*
-ApplyCursorsToEdges TODO
+ApplyCursorsToEdges slices edges according to cursors
 */
 func ApplyCursorsToEdges(all []*Edge, before, after *string) []*Edge {
 	edges := all
@@ -115,7 +128,7 @@ func ApplyCursorsToEdges(all []*Edge, before, after *string) []*Edge {
 	if before != nil {
 		for i, e := range edges {
 			if e.Cursor == *before {
-				edges = edges[:i]
+				edges = edges[:i+1]
 				break
 			}
 		}
@@ -124,7 +137,9 @@ func ApplyCursorsToEdges(all []*Edge, before, after *string) []*Edge {
 }
 
 /*
-HasPreviousPage TODO
+HasPreviousPage determines whether there's a previous page according to cursors
+
+https://facebook.github.io/relay/graphql/connections.htm#sec-undefined.PageInfo.Fields
 */
 func HasPreviousPage(all []*Edge, before, after *string, last int) bool {
 	if last > 0 {
@@ -132,26 +147,18 @@ func HasPreviousPage(all []*Edge, before, after *string, last int) bool {
 		return len(edges) > last
 	}
 
-	if after != nil {
-		last := all[len(all)-1]
-		return last.Cursor != *after
-	}
-
 	return false
 }
 
 /*
-HasNextPage TODO
+HasNextPage determines whether there's another page according to cursors
+
+https://facebook.github.io/relay/graphql/connections.htm#sec-undefined.PageInfo.Fields
 */
 func HasNextPage(all []*Edge, before, after *string, first int) bool {
 	if first > 0 {
 		edges := ApplyCursorsToEdges(all, before, after)
 		return len(edges) > first
-	}
-
-	if before != nil {
-		first := all[0]
-		return first.Cursor != *before
 	}
 
 	return false
