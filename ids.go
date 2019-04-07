@@ -5,7 +5,7 @@ import (
 	"strings"
 )
 
-type GlobalID struct {
+type Local struct {
 	Type string `json:"type"`
 	ID   string `json:"id"`
 }
@@ -16,7 +16,7 @@ func ToGlobalID(ttype string, id string) string {
 }
 
 // FromGlobalID splits the global ID into a type and the original ID
-func FromGlobalID(id string) *GlobalID {
+func FromGlobalID(id string) *Local {
 	bytes, err := base64.StdEncoding.DecodeString(id)
 	if err != nil {
 		return nil
@@ -27,7 +27,7 @@ func FromGlobalID(id string) *GlobalID {
 		return nil
 	}
 
-	return &GlobalID{
+	return &Local{
 		Type: tokens[0],
 		ID:   tokens[1],
 	}

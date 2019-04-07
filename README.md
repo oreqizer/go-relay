@@ -10,6 +10,18 @@ It ain't much but it's honest work.
 
 ## API
 
+### IDs
+
+There are two functions - `ToGlobalID` and `FromGlobalID`. They behave the same like the JS reference implementation.
+
+```go
+var global = relay.ToGlobalID("User", "asdf") // Returns a base64 encoded string
+
+var local = relay.FromGlobalID(global) // local.Type = "User", local.ID == "asdf"
+```
+
+### Connections
+
 The only function you care about is `ConnectionFromArray`.
 
 Make your types satisfy the `Node` interface and create the `ConnectionArgs` object, feed it into it and you'll get a `Connection`.
