@@ -17,7 +17,7 @@ There are two functions - `ToGlobalID` and `FromGlobalID`. They behave the same 
 ```go
 var global = relay.ToGlobalID("User", "asdf") // Returns a base64 encoded string
 
-var local = relay.FromGlobalID(global) // local.Type = "User", local.ID == "asdf"
+var local = relay.FromGlobalID(global) // local.Type == "User", local.ID == "asdf"
 ```
 
 ### Connections
