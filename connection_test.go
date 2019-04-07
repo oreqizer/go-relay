@@ -9,7 +9,7 @@ type Node struct {
 	Id string
 }
 
-func (n *Node) ID() string {
+func (n *Node) GetID() string {
 	return n.Id
 }
 

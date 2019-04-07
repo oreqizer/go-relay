@@ -34,7 +34,7 @@ type User struct {
 }
 
 // Satisfy the Node interface
-func (u *User) ID() string {
+func (u *User) GetID() string {
 	return u.Id
 }
 
