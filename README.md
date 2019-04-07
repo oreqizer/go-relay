@@ -29,19 +29,19 @@ Make your types satisfy the `Node` interface and create the `ConnectionArgs` obj
 ```go
 // Our model
 type User struct {
-	Id string
+	ID string
 	Name string
 }
 
 // Satisfy the Node interface
 func (u *User) GetID() string {
-	return u.Id
+	return u.ID
 }
 
 var nodes = []relay.Node{
-	&User{Id: "1", Name: "Lol"},
-	&User{Id: "2", Name: "Kek"},
-	&User{Id: "3", Name: "Bur"},
+	&User{ID: "1", Name: "Lol"},
+	&User{ID: "2", Name: "Kek"},
+	&User{ID: "3", Name: "Bur"},
 }
 
 var args = &relay.ConnectionArgs{Before: nil, After: nil, First: 2, Last: 0}

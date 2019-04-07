@@ -6,11 +6,11 @@ import (
 )
 
 type Node struct {
-	Id string
+	ID string
 }
 
 func (n *Node) GetID() string {
-	return n.Id
+	return n.ID
 }
 
 var (
@@ -22,19 +22,19 @@ var (
 )
 
 var nodes = []relay.Node{
-	&Node{Id: ONE},
-	&Node{Id: TWO},
-	&Node{Id: THREE},
-	&Node{Id: FOUR},
-	&Node{Id: FIVE},
+	&Node{ID: ONE},
+	&Node{ID: TWO},
+	&Node{ID: THREE},
+	&Node{ID: FOUR},
+	&Node{ID: FIVE},
 }
 
 var edges = []*relay.Edge{
-	{Node: &Node{Id: ONE}, Cursor: ONE},
-	{Node: &Node{Id: TWO}, Cursor: TWO},
-	{Node: &Node{Id: THREE}, Cursor: THREE},
-	{Node: &Node{Id: FOUR}, Cursor: FOUR},
-	{Node: &Node{Id: FIVE}, Cursor: FIVE},
+	{Node: &Node{ID: ONE}, Cursor: ONE},
+	{Node: &Node{ID: TWO}, Cursor: TWO},
+	{Node: &Node{ID: THREE}, Cursor: THREE},
+	{Node: &Node{ID: FOUR}, Cursor: FOUR},
+	{Node: &Node{ID: FIVE}, Cursor: FIVE},
 }
 
 var tableConnectionFromArray = []struct {
