@@ -14,27 +14,37 @@ func (n *Node) GetID() string {
 }
 
 var (
-	ONE   = "1"
-	TWO   = "2"
-	THREE = "3"
-	FOUR  = "4"
-	FIVE  = "5"
+	ONESTR   = "1"
+	TWOSTR   = "2"
+	THREESTR = "3"
+	FOURSTR  = "4"
+	FIVESTR  = "5"
+)
+
+var (
+	ZERO = 0
+	ONE  = 1
+	TWO  = 2
+	// THREE = 3
+	FOUR = 4
+	// FIVE  = 5
+	SIX = 6
 )
 
 var nodes = []relay.Node{
-	&Node{ID: ONE},
-	&Node{ID: TWO},
-	&Node{ID: THREE},
-	&Node{ID: FOUR},
-	&Node{ID: FIVE},
+	&Node{ID: ONESTR},
+	&Node{ID: TWOSTR},
+	&Node{ID: THREESTR},
+	&Node{ID: FOURSTR},
+	&Node{ID: FIVESTR},
 }
 
 var edges = []*relay.Edge{
-	{Node: &Node{ID: ONE}, Cursor: ONE},
-	{Node: &Node{ID: TWO}, Cursor: TWO},
-	{Node: &Node{ID: THREE}, Cursor: THREE},
-	{Node: &Node{ID: FOUR}, Cursor: FOUR},
-	{Node: &Node{ID: FIVE}, Cursor: FIVE},
+	{Node: &Node{ID: ONESTR}, Cursor: ONESTR},
+	{Node: &Node{ID: TWOSTR}, Cursor: TWOSTR},
+	{Node: &Node{ID: THREESTR}, Cursor: THREESTR},
+	{Node: &Node{ID: FOURSTR}, Cursor: FOURSTR},
+	{Node: &Node{ID: FIVESTR}, Cursor: FIVESTR},
 }
 
 var tableConnectionFromArray = []struct {
@@ -44,34 +54,34 @@ var tableConnectionFromArray = []struct {
 }{
 	{
 		nodes: nodes,
-		args:  &relay.ConnectionArgs{Before: nil, After: nil, First: 0, Last: 0},
+		args:  &relay.ConnectionArgs{Before: nil, After: nil, First: &ZERO, Last: &ZERO},
 		out: &relay.Connection{
 			Edges:    edges,
-			PageInfo: &relay.PageInfo{HasNextPage: false, HasPreviousPage: false, StartCursor: &ONE, EndCursor: &FIVE},
+			PageInfo: relay.PageInfo{HasNextPage: false, HasPreviousPage: false, StartCursor: &ONESTR, EndCursor: &FIVESTR},
 		},
 	},
 	{
 		nodes: nodes,
-		args:  &relay.ConnectionArgs{Before: nil, After: nil, First: 2, Last: 0},
+		args:  &relay.ConnectionArgs{Before: nil, After: nil, First: &TWO, Last: &ZERO},
 		out: &relay.Connection{
 			Edges:    edges[:2],
-			PageInfo: &relay.PageInfo{HasNextPage: true, HasPreviousPage: false, StartCursor: &ONE, EndCursor: &TWO},
+			PageInfo: relay.PageInfo{HasNextPage: true, HasPreviousPage: false, StartCursor: &ONESTR, EndCursor: &TWOSTR},
 		},
 	},
 	{
 		nodes: nodes,
-		args:  &relay.ConnectionArgs{Before: nil, After: nil, First: 0, Last: 2},
+		args:  &relay.ConnectionArgs{Before: nil, After: nil, First: &ZERO, Last: &TWO},
 		out: &relay.Connection{
 			Edges:    edges[3:],
-			PageInfo: &relay.PageInfo{HasNextPage: false, HasPreviousPage: true, StartCursor: &FOUR, EndCursor: &FIVE},
+			PageInfo: relay.PageInfo{HasNextPage: false, HasPreviousPage: true, StartCursor: &FOURSTR, EndCursor: &FIVESTR},
 		},
 	},
 	{
 		nodes: nodes,
-		args:  &relay.ConnectionArgs{Before: &FOUR, After: &TWO, First: 0, Last: 0},
+		args:  &relay.ConnectionArgs{Before: &FOURSTR, After: &TWOSTR, First: &ZERO, Last: &ZERO},
 		out: &relay.Connection{
 			Edges:    edges[1:4],
-			PageInfo: &relay.PageInfo{HasNextPage: false, HasPreviousPage: false, StartCursor: &TWO, EndCursor: &FOUR},
+			PageInfo: relay.PageInfo{HasNextPage: false, HasPreviousPage: false, StartCursor: &TWOSTR, EndCursor: &FOURSTR},
 		},
 	},
 }
@@ -125,14 +135,14 @@ var tableEdgesToReturn = []struct {
 	edges  []*relay.Edge
 	before *string
 	after  *string
-	first  int
-	last   int
+	first  *int
+	last   *int
 	out    *relay.Connection
 }{
-	{edges: edges, before: nil, after: nil, first: 0, last: 0, out: tableConnectionFromArray[0].out},
-	{edges: edges, before: nil, after: nil, first: 2, last: 0, out: tableConnectionFromArray[1].out},
-	{edges: edges, before: nil, after: nil, first: 0, last: 2, out: tableConnectionFromArray[2].out},
-	{edges: edges, before: &FOUR, after: &TWO, first: 0, last: 0, out: tableConnectionFromArray[3].out},
+	{edges: edges, before: nil, after: nil, first: &ZERO, last: &ZERO, out: tableConnectionFromArray[0].out},
+	{edges: edges, before: nil, after: nil, first: &TWO, last: &ZERO, out: tableConnectionFromArray[1].out},
+	{edges: edges, before: nil, after: nil, first: &ZERO, last: &TWO, out: tableConnectionFromArray[2].out},
+	{edges: edges, before: &FOURSTR, after: &TWOSTR, first: &ZERO, last: &ZERO, out: tableConnectionFromArray[3].out},
 }
 
 func TestEdgesToReturn(t *testing.T) {
@@ -177,9 +187,9 @@ var tableApplyCursorsToEdges = []struct {
 	len    int
 }{
 	{edges: edges, before: nil, after: nil, len: 5},
-	{edges: edges, before: nil, after: &TWO, len: 4},
-	{edges: edges, before: &FOUR, after: nil, len: 4},
-	{edges: edges, before: &FOUR, after: &TWO, len: 3},
+	{edges: edges, before: nil, after: &TWOSTR, len: 4},
+	{edges: edges, before: &FOURSTR, after: nil, len: 4},
+	{edges: edges, before: &FOURSTR, after: &TWOSTR, len: 3},
 }
 
 func TestApplyCursorsToEdges(t *testing.T) {
@@ -203,14 +213,15 @@ var tableHasPreviousPage = []struct {
 	edges  []*relay.Edge
 	before *string
 	after  *string
-	last   int
+	last   *int
 	out    bool
 }{
-	{edges: edges, before: nil, after: nil, last: 0, out: false},
-	{edges: edges, before: nil, after: nil, last: 6, out: false},
-	{edges: edges, before: nil, after: nil, last: 4, out: true},
-	{edges: edges, before: &FOUR, after: &TWO, last: 4, out: false},
-	{edges: edges, before: &FOUR, after: &TWO, last: 1, out: true},
+	{edges: edges, before: nil, after: nil, last: nil, out: false},
+	{edges: edges, before: nil, after: nil, last: &ZERO, out: false},
+	{edges: edges, before: nil, after: nil, last: &SIX, out: false},
+	{edges: edges, before: nil, after: nil, last: &FOUR, out: true},
+	{edges: edges, before: &FOURSTR, after: &TWOSTR, last: &FOUR, out: false},
+	{edges: edges, before: &FOURSTR, after: &TWOSTR, last: &ONE, out: true},
 }
 
 func TestHasPreviousPage(t *testing.T) {
@@ -226,14 +237,15 @@ var tableHasNextPage = []struct {
 	edges  []*relay.Edge
 	before *string
 	after  *string
-	first  int
+	first  *int
 	out    bool
 }{
-	{edges: edges, before: nil, after: nil, first: 0, out: false},
-	{edges: edges, before: nil, after: nil, first: 6, out: false},
-	{edges: edges, before: nil, after: nil, first: 4, out: true},
-	{edges: edges, before: &FOUR, after: &TWO, first: 4, out: false},
-	{edges: edges, before: &FOUR, after: &TWO, first: 1, out: true},
+	{edges: edges, before: nil, after: nil, first: nil, out: false},
+	{edges: edges, before: nil, after: nil, first: &ZERO, out: false},
+	{edges: edges, before: nil, after: nil, first: &SIX, out: false},
+	{edges: edges, before: nil, after: nil, first: &FOUR, out: true},
+	{edges: edges, before: &FOURSTR, after: &TWOSTR, first: &FOUR, out: false},
+	{edges: edges, before: &FOURSTR, after: &TWOSTR, first: &ONE, out: true},
 }
 
 func TestHasNextPage(t *testing.T) {
