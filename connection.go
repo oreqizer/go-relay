@@ -6,7 +6,7 @@ Node is an interface for types satisfying Relay's Node interface
 https://facebook.github.io/relay/graphql/objectidentification.htm#sec-Node-Interface
 */
 type Node interface {
-	GetID() string
+	ID() string
 }
 
 /*
@@ -65,7 +65,7 @@ func ConnectionFromArray(nodes []Node, args *ConnectionArgs) *Connection {
 	for i, n := range nodes {
 		edges[i] = &Edge{
 			Node:   n,
-			Cursor: n.GetID(),
+			Cursor: n.ID(),
 		}
 	}
 

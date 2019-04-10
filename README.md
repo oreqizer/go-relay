@@ -29,22 +29,22 @@ Make your types satisfy the `Node` interface and create the `ConnectionArgs` obj
 ```go
 // Our model
 type User struct {
-	ID string
-	Name string
+	LocalID string
+	Name    string
 }
 
 // Satisfy the Node interface
-func (u *User) GetID() string {
-	return u.ID
+func (u *User) ID() string {
+	return u.LocalID
 }
 
 var nodes = []relay.Node{
-	&User{ID: "1", Name: "Lol"},
-	&User{ID: "2", Name: "Kek"},
-	&User{ID: "3", Name: "Bur"},
+	&User{LocalID: "1", Name: "Lol"},
+	&User{LocalID: "2", Name: "Kek"},
+	&User{LocalID: "3", Name: "Bur"},
 }
 
-var args = &relay.ConnectionArgs{Before: nil, After: nil, First: 2, Last: 0}
+var args = &relay.ConnectionArgs{Before: nil, After: nil, First: 2, Last: nil}
 
 var conn = relay.ConnectionFromArray(nodes, args) // There you go!
 ```

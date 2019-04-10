@@ -10,12 +10,12 @@ type Local struct {
 	ID   string `json:"id"`
 }
 
-// ToGlobalID creates a globally unique GetID
+// ToGlobalID creates a globally unique ID
 func ToGlobalID(ttype string, id string) string {
 	return base64.StdEncoding.EncodeToString([]byte(ttype + ":" + id))
 }
 
-// FromGlobalID splits the global GetID into a type and the original GetID
+// FromGlobalID splits the global ID into a type and the original ID
 func FromGlobalID(id string) *Local {
 	bytes, err := base64.StdEncoding.DecodeString(id)
 	if err != nil {
