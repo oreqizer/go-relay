@@ -90,14 +90,16 @@ func EdgesToReturn(all []*Edge, before, after *string, first, last *int) *Connec
 	}
 
 	var startCursor, endCursor *string
-	if fst := edges[0]; fst != nil {
-		str := fst.Cursor
-		startCursor = &str
-	}
+	if len(edges) > 0 {
+		if fst := edges[0]; fst != nil {
+			str := fst.Cursor
+			startCursor = &str
+		}
 
-	if lst := edges[len(edges)-1]; lst != nil {
-		str := lst.Cursor
-		endCursor = &str
+		if lst := edges[len(edges)-1]; lst != nil {
+			str := lst.Cursor
+			endCursor = &str
+		}
 	}
 
 	return &Connection{

@@ -53,6 +53,14 @@ var tableConnectionFromArray = []struct {
 	out   *relay.Connection
 }{
 	{
+		nodes: []relay.Node{},
+		args:  &relay.ConnectionArgs{Before: nil, After: nil, First: &ZERO, Last: &ZERO},
+		out: &relay.Connection{
+			Edges:    []*relay.Edge{},
+			PageInfo: relay.PageInfo{HasNextPage: false, HasPreviousPage: false, StartCursor: nil, EndCursor: nil},
+		},
+	},
+	{
 		nodes: nodes,
 		args:  &relay.ConnectionArgs{Before: nil, After: nil, First: &ZERO, Last: &ZERO},
 		out: &relay.Connection{
@@ -108,12 +116,16 @@ func TestConnectionFromArray(t *testing.T) {
 			t.Errorf("%d: Has previous page: got %v, want %v", i, out.PageInfo.HasPreviousPage, e.out.PageInfo.HasPreviousPage)
 		}
 
-		if *out.PageInfo.StartCursor != *e.out.PageInfo.StartCursor {
-			t.Errorf("%d: Start cursor: got %v, want %v", i, *out.PageInfo.StartCursor, *e.out.PageInfo.StartCursor)
+		if out.PageInfo.StartCursor != nil || e.out.PageInfo.StartCursor != nil {
+			if *out.PageInfo.StartCursor != *e.out.PageInfo.StartCursor {
+				t.Errorf("%d: Start cursor: got %v, want %v", i, *out.PageInfo.StartCursor, *e.out.PageInfo.StartCursor)
+			}
 		}
 
-		if *out.PageInfo.EndCursor != *e.out.PageInfo.EndCursor {
-			t.Errorf("%d: End cursor: got %v, want %v", i, *out.PageInfo.EndCursor, *e.out.PageInfo.EndCursor)
+		if out.PageInfo.EndCursor != nil || e.out.PageInfo.EndCursor != nil {
+			if *out.PageInfo.EndCursor != *e.out.PageInfo.EndCursor {
+				t.Errorf("%d: End cursor: got %v, want %v", i, *out.PageInfo.EndCursor, *e.out.PageInfo.EndCursor)
+			}
 		}
 
 		// Edges
@@ -139,10 +151,11 @@ var tableEdgesToReturn = []struct {
 	last   *int
 	out    *relay.Connection
 }{
-	{edges: edges, before: nil, after: nil, first: &ZERO, last: &ZERO, out: tableConnectionFromArray[0].out},
-	{edges: edges, before: nil, after: nil, first: &TWO, last: &ZERO, out: tableConnectionFromArray[1].out},
-	{edges: edges, before: nil, after: nil, first: &ZERO, last: &TWO, out: tableConnectionFromArray[2].out},
-	{edges: edges, before: &FOURSTR, after: &TWOSTR, first: &ZERO, last: &ZERO, out: tableConnectionFromArray[3].out},
+	{edges: []*relay.Edge{}, before: nil, after: nil, first: &ZERO, last: &ZERO, out: tableConnectionFromArray[0].out},
+	{edges: edges, before: nil, after: nil, first: &ZERO, last: &ZERO, out: tableConnectionFromArray[1].out},
+	{edges: edges, before: nil, after: nil, first: &TWO, last: &ZERO, out: tableConnectionFromArray[2].out},
+	{edges: edges, before: nil, after: nil, first: &ZERO, last: &TWO, out: tableConnectionFromArray[3].out},
+	{edges: edges, before: &FOURSTR, after: &TWOSTR, first: &ZERO, last: &ZERO, out: tableConnectionFromArray[4].out},
 }
 
 func TestEdgesToReturn(t *testing.T) {
@@ -157,12 +170,16 @@ func TestEdgesToReturn(t *testing.T) {
 			t.Errorf("%d: Has previous page: got %v, want %v", i, out.PageInfo.HasPreviousPage, e.out.PageInfo.HasPreviousPage)
 		}
 
-		if *out.PageInfo.StartCursor != *e.out.PageInfo.StartCursor {
-			t.Errorf("%d: Start cursor: got %v, want %v", i, *out.PageInfo.StartCursor, *e.out.PageInfo.StartCursor)
+		if out.PageInfo.StartCursor != nil || e.out.PageInfo.StartCursor != nil {
+			if *out.PageInfo.StartCursor != *e.out.PageInfo.StartCursor {
+				t.Errorf("%d: Start cursor: got %v, want %v", i, *out.PageInfo.StartCursor, *e.out.PageInfo.StartCursor)
+			}
 		}
 
-		if *out.PageInfo.EndCursor != *e.out.PageInfo.EndCursor {
-			t.Errorf("%d: End cursor: got %v, want %v", i, *out.PageInfo.EndCursor, *e.out.PageInfo.EndCursor)
+		if out.PageInfo.EndCursor != nil || e.out.PageInfo.EndCursor != nil {
+			if *out.PageInfo.EndCursor != *e.out.PageInfo.EndCursor {
+				t.Errorf("%d: End cursor: got %v, want %v", i, *out.PageInfo.EndCursor, *e.out.PageInfo.EndCursor)
+			}
 		}
 
 		// Edges
@@ -186,6 +203,7 @@ var tableApplyCursorsToEdges = []struct {
 	after  *string
 	len    int
 }{
+	{edges: []*relay.Edge{}, before: nil, after: nil, len: 0},
 	{edges: edges, before: nil, after: nil, len: 5},
 	{edges: edges, before: nil, after: &TWOSTR, len: 4},
 	{edges: edges, before: &FOURSTR, after: nil, len: 4},
@@ -199,12 +217,14 @@ func TestApplyCursorsToEdges(t *testing.T) {
 			t.Errorf("%d: Length: got %d, want %d", i, len(out), e.len)
 		}
 
-		if cursor := out[len(out)-1].Cursor; e.before != nil && cursor != *e.before {
-			t.Errorf("%d: Before: got %s, want %s", i, cursor, *e.before)
-		}
+		if len(out) > 0 {
+			if cursor := out[len(out)-1].Cursor; e.before != nil && cursor != *e.before {
+				t.Errorf("%d: Before: got %s, want %s", i, cursor, *e.before)
+			}
 
-		if cursor := out[0].Cursor; e.after != nil && cursor != *e.after {
-			t.Errorf("%d: After: got %s, want %s", i, cursor, *e.after)
+			if cursor := out[0].Cursor; e.after != nil && cursor != *e.after {
+				t.Errorf("%d: After: got %s, want %s", i, cursor, *e.after)
+			}
 		}
 	}
 }
@@ -216,6 +236,7 @@ var tableHasPreviousPage = []struct {
 	last   *int
 	out    bool
 }{
+	{edges: []*relay.Edge{}, before: nil, after: nil, last: nil, out: false},
 	{edges: edges, before: nil, after: nil, last: nil, out: false},
 	{edges: edges, before: nil, after: nil, last: &ZERO, out: false},
 	{edges: edges, before: nil, after: nil, last: &SIX, out: false},
@@ -240,6 +261,7 @@ var tableHasNextPage = []struct {
 	first  *int
 	out    bool
 }{
+	{edges: []*relay.Edge{}, before: nil, after: nil, first: nil, out: false},
 	{edges: edges, before: nil, after: nil, first: nil, out: false},
 	{edges: edges, before: nil, after: nil, first: &ZERO, out: false},
 	{edges: edges, before: nil, after: nil, first: &SIX, out: false},
